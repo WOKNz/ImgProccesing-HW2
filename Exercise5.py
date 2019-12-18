@@ -4,6 +4,8 @@ import matplotlib.animation as animation
 import cv2
 import numpy as np
 import glob
+import pylab
+import imageio
 
 if __name__ == '__main__':
 
@@ -63,8 +65,16 @@ if __name__ == '__main__':
     writer = animation.ImageMagickFileWriter()
     ani.save('video.gif', writer=writer)
 
-
     # Bonus
+
+    # load data
+    matF = spIO.loadmat('video1.mat')
+    video = matF['video1']
+    myimages = []
+    fig = plt.figure()
+
+
+    # apply Otsu
     def otsu(img):
         # Otsu's thresholding after Gaussian filtering
         blur = cv2.GaussianBlur(img, (5, 5), 0)
@@ -74,11 +84,12 @@ if __name__ == '__main__':
 
     for frame in range(video.shape[2]):
         imgofvideo = video[:, :, frame]
-        imgplot = plt.imshow(match(imgofvideo, pic2s, 0.65))
+        imgplot = plt.imshow(otsu(imgofvideo), cmap='gray', interpolation='nearest')
         myimages.append([imgplot])
 
     ani = animation.ArtistAnimation(fig, myimages, interval=200, blit=True, repeat_delay=1e9)
 
+    # Save
     plt.axis('off')
     writer = animation.ImageMagickFileWriter()
-    ani.save('video.gif', writer=writer)
+    ani.save('OtsuVideo.gif', writer=writer)
